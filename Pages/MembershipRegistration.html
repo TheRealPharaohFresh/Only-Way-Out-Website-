@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../Styles/styles4.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" >
+        <title>Membership Registration Page</title>
+    </head>
+    <header>
+        <nav class="navbar navbar-expand-xl custom-nav" >
+            <div class="container-fluid">
+                <a href="Home.html">
+                    <img src="../images/onlywayoutloho.PNG" alt="only way out logo" class="logo">    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBasic" aria-controls="navbarBasic" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                        
+                    </button>
+                    <div class="collapse navbar-collapse show" id="navbarBasic">
+                        <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+                            <li class="nav-item"><a class= "nav-link active" aria-current="page" href="Home.html">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" href="Albums.html">Albums</a></li>
+                            <li class="nav-item"><a  class="nav-link" href=Videos.html>Videos</a></li>
+                            <li class="nav-item"><a class="nav-link" href="MembershipRegistration.html">Membership Registration</a></li>
+                            <li class="nav-item"><a class="nav-link" href="Information.html">Information Page</a></li>
+                        </ul>
+                    </div>
+                </a>
+            </div>
+            
+        </nav>
+        <h1>Member Registration Form
+            
+        </h1>
+        <fieldset class="form-container">
+            <form id ="registrationForm" action="/submit" method="POST">
+    
+                
+                <label class="label-comment" for="name">Full Name:</label>
+                <input class="form-control" type="text" id="name" name="name" placeholder="Enter Name">
+                
+                <label class="label-comment" for="email">Email:</label>
+                <input class="form-control" type="email" id="email" name="email" placeholder="Enter Email" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ " required >
+                
+                <label class="label-comment" for="password">Password:</label>
+                <input class="form-control" type="password" id="password" name="password" minlength="7" maxlength="18" placeholder="Enter Password" required>
+                
+                
+                <div> 
+                    
+                    <button class="bttn" type="reset">Reset</button>
+                    <button class="bttn" type="submit">Submit</button>
+                    
+                </div>
+            </form>
+        </fieldset>
+    </header>
+    <body>
+    
+    
+    </body>
+        <script type="module">
+            // Import Firebase modules
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+            import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+            import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+            import dotenv from 'dotenv';
+            dotenv.config();
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: process.env.REACT_APP_API_KEY,
+            authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+            projectId: process.env.REACT_APP_PROJECT_ID,
+            storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+            messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+            appId: process.env.REACT_APP_APP_ID,
+            measurementId: process.env.REACT_APP_MEASUREMENT_ID
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        console.log("Firebase initialized successfully!");
+
+        //Listen for form submission
+        const registrationForm = document.getElementById('registrationForm');
+        registrationForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent the default form submission
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            try {
+                await addDoc(collection(db,'members'), {
+                    name: name,
+                    email: email,
+                    password: password,
+                    createdAt: new Date()
+                });
+                alert('Registration successful!');
+                registrationForm.reset(); // Reset the form
+            } catch (error) {
+                console.error('Error adding document: ', error);
+                alert('Registration failed. Please try again.');
+            }   
+
+        });    
+    </script>
+</html> 

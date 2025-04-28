@@ -1,0 +1,59 @@
+html {
+background-image: url(../images/onlywayoutloho.PNG);
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.label-comment {
+    color: white;
+}
+
+h1 {
+    color: ghostwhite;
+    text-align: center;
+}
+
+@font-face {
+    font-family: "SAIBA-45";
+    src: url("/Users/therealpharaohfresh/Desktop/Font-Folder/saiba-45/SAIBA-45.ttf");
+}
+
+.bttn {
+    font-size: 22px;
+    margin: 20px;
+    color: crimson;
+    font-family:  "SAIBA-45";
+    background-color: black;
+
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+
+}
+.custom-nav {
+    background-color: black !important;
+    box-shadow: 0 0 10px #077b32;
+}
+.custom-nav a {
+    position: relative;
+   /* margin: 0 20px; */
+    font-size: 1.2rem;
+    color: white !important;
+    font-weight: 550;
+    font-family:Georgia, 'Times New Roman', Times, serif;
+    text-decoration: none;
+    transition: 0.3s linear;
+}
