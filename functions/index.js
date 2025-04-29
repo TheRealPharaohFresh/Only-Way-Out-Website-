@@ -1,6 +1,5 @@
-const {onDocumentCreated} = require("firebase-functions/v2/firestore");
-const logger = require("firebase-functions/logger");
 const functions = require("firebase-functions");
+const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const mailjet = require("node-mailjet");
 require("dotenv").config();
@@ -47,10 +46,10 @@ exports.sendWelcomeEmail = onDocumentCreated("members/{memberId}", (event) => {
 
   return request
       .then((result) => {
-        logger.info("Email sent successfully:", result.body);
+        console.log("Email sent successfully:", result.body);
       })
       .catch((err) => {
-        logger.error("Error sending email:", err);
+        console.error("Error sending email:", err);
       });
 });
 
