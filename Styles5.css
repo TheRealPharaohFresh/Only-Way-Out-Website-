@@ -1,38 +1,35 @@
 html {
     background-color: #f9f9f9;
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
 }
 
-
-h1 {
+h1, h2, h3 {
     text-align: center;
-}
-
-h2 {
-    text-align: center;
+    color: #333;
 }
 
 table {
     text-align: center;
-    width: 60%;
+    width: 80%;
     border-collapse: collapse;
     border: 1px solid #ddd;
-    margin: 0 auto;
-
+    margin: 20px auto;
 }
+
 .table-container {
     margin: 20px auto;
     width: fit-content;
-    height: auto;
     background: white;
     padding: 20px;
     border-radius: 8px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Added initial box shadow for subtle effect */
 }
 
 .table-container:hover {
     transform: scale(1.05); 
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    
 }
 
 th, td {
@@ -42,22 +39,20 @@ th, td {
 
 th:hover, td:hover {
     background-color: #f4f4f4;  
-    color: #333;           
+    color: #333;
 }
 
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-
 tr:nth-child(1) {
-    background-color: #ffcccc; 
+    background-color: #ffcccc;
 }
 
 tr:nth-child(3) {
-    background-color: #cceeff; /* Light red */
+    background-color: #cceeff;
 }
-
 
 .contact-bar {
     background: #333;
@@ -69,7 +64,6 @@ tr:nth-child(3) {
     flex-wrap: wrap;
     font-size: 16px;
 }
-
 
 .contact-item {
     display: flex;
@@ -83,21 +77,6 @@ tr:nth-child(3) {
     color: #ffcc00;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .contact-bar {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-
-
-
-h3 {
-    text-align: center;
-    
-}
-
 .logo {
     width: 80px;
     height: 80px;
@@ -107,20 +86,67 @@ h3 {
     left: 10px;
     object-fit: cover;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-
-
 }
+
 .custom-nav {
     background-color: black !important;
     box-shadow: 0 0 10px #077b32;
+    padding: 10px 20px;
 }
+
 .custom-nav a {
     position: relative;
-   /* margin: 0 20px; */
     font-size: 1.2rem;
     color: white !important;
     font-weight: 550;
-    font-family:Georgia, 'Times New Roman', Times, serif;
+    font-family: Georgia, 'Times New Roman', Times, serif;
     text-decoration: none;
     transition: 0.3s linear;
+    margin: 0 10px;
+}
+
+.custom-nav a:hover {
+    color: #077b32;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    html {
+        background-position: top;
+    }
+
+    .table-container {
+        width: 95%; /* Allow the table to scale properly on smaller devices */
+        padding: 10px;
+    }
+
+    table {
+        width: 100%; /* Ensure the table takes up full width on mobile */
+    }
+
+    .contact-bar {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 10px;
+    }
+
+    .contact-item {
+        margin: 10px 0;
+    }
+
+    .custom-nav a {
+        font-size: 1rem;
+        padding: 8px;
+    }
+
+    h1, h2, h3 {
+        font-size: 1.5rem;
+    }
+
+    .logo {
+        width: 60px;
+        height: 60px;
+        top: 5px;
+        left: 5px;
+    }
 }

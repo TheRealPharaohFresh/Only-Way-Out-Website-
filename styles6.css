@@ -7,27 +7,54 @@
     left: 10px;
     object-fit: cover;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-
-
 }
 
+/* Custom Navigation */
 .custom-nav {
     background-color: black !important;
     box-shadow: 0 0 10px #077b32;
+    padding: 10px 20px; /* Added padding to give some space around nav items */
 }
+
 .custom-nav a {
     position: relative;
-    /* margin: 0 20px; */
     font-size: 1.2rem;
     color: white !important;
     font-weight: 550;
-    font-family:Georgia, 'Times New Roman', Times, serif;
+    font-family: Georgia, 'Times New Roman', Times, serif;
     text-decoration: none;
     transition: 0.3s linear;
+    margin: 0 15px; /* Added margin for spacing between nav items */
 }
 
+.custom-nav a:hover {
+    color: #077b32; /* Subtle hover effect for navigation items */
+}
+
+/* Header Styles */
 header h1 {
     text-align: center;
     font-weight: bold;
+    font-size: 2rem; /* Increased size for better visibility */
+    color: white;
+    margin-top: 20px; /* Added margin for spacing */
+}
 
+/* Responsive Design */
+@media (max-width: 768px) {
+    .logo {
+        width: 60px;
+        height: 60px;
+        top: 5px;
+        left: 5px;
+    }
+
+    .custom-nav a {
+        font-size: 1rem; /* Smaller font size on mobile */
+        margin: 0 10px; /* Adjusted margin for smaller screens */
+    }
+
+    header h1 {
+        font-size: 1.5rem; /* Reduced font size for mobile */
+    }
 }
