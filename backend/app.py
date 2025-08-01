@@ -24,17 +24,16 @@ def download(track):
         abort(403, description="Unauthorized or missing token")
 
     track_map = {
-    "keep-it-100": "PharaohFresh-Keep it 100 Ft Atl Jacob.mp3",
-    "for-me": "PharaohFresh-For Me.mp3"
-}
-
+        "keep-it-100": "PharaohFresh Ft AtlJacob - Keep It 100.mp3",
+        "for-me": "PharaohFresh - For Me.mp3"
+    }
 
     filename = track_map.get(track)
     if not filename:
         abort(404, description="Track not found")
 
     file_path = os.path.join(MUSIC_DIR, filename)
-    print(f"Looking for file at: {file_path}")  # <--- moved here
+    print(f"Looking for file at: {file_path}")
 
     if not os.path.exists(file_path):
         abort(404, description="File missing on server")
