@@ -1,0 +1,53 @@
+name: Full Stack Deploy (Flask + Firebase)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 🔁 Pull the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # 🐍 Set up Python for Flask
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run Flask sanity check (optional)
+        run: |
+          source venv/bin/activate
+          python app.py &
+          sleep 5
+          curl --fail http://localhost:5000 || (echo "Flask app not running" && exit 1)
+
+      # 🔥 Set up Node for Firebase Functions
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Install Functions Dependencies
+        run: npm install
+        working-directory: functions
+
+      # 🚀 Deploy Firebase Functions
+      - name: Deploy to Firebase
+        run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
