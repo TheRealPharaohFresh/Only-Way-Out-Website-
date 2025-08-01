@@ -24,7 +24,9 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-          pip install -r requirements.txt
+          pip install --upgrade pip
+          pip install -r backend/requirements.txt
+        
 
       - name: Run Flask sanity check (optional)
         run: |
