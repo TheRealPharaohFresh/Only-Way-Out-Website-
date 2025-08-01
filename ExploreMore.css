@@ -1,0 +1,87 @@
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    position: static;
+    margin-right: 20px;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Navigation Styles */
+.custom-nav {
+    background-color: black !important;
+    box-shadow: 0 0 10px #077b32;
+    padding: 10px 20px;
+}
+
+.custom-nav .navbar-brand {
+    display: flex;
+    align-items: center;
+    color: white !important;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.custom-nav .navbar-toggler {
+    border-color: #077b32;
+    background-color: white;
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+
+.custom-nav .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='black' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.custom-nav .nav-link {
+    position: relative;
+    font-size: 1.2rem;
+    color: white !important;
+    font-weight: 550;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    text-decoration: none;
+    transition: 0.3s linear;
+    margin: 0 25px;
+    line-height: 1.2;
+}
+
+.custom-nav .nav-link:hover {
+    color: #077b32;
+}
+/* Header Styles */
+header h1 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2rem; /* Increased size for better visibility */
+    color: white;
+    margin-top: 20px; /* Added margin for spacing */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .logo {
+        width: 60px;
+        height: 60px;
+        top: 5px;
+        left: 5px;
+    }
+
+    .custom-nav a {
+        font-size: 1rem; /* Smaller font size on mobile */
+        margin: 0 10px; /* Adjusted margin for smaller screens */
+    }
+
+    header h1 {
+        font-size: 1.5rem; /* Reduced font size for mobile */
+    }
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: black !important;
+    color: #077b32;
+}

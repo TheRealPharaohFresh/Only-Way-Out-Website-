@@ -1,0 +1,53 @@
+/* Logo Styles */
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    position: static;
+    top: 10px;
+    left: 10px;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.custom-nav {
+    background-color: black !important;
+    box-shadow: 0 0 10px #077b32;
+    padding: 10px 20px; /* Added padding to give space around nav items */
+}
+.custom-nav a {
+    position: relative;
+    font-size: 1.2rem;
+    color: white !important;
+    font-weight: 550;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    text-decoration: none;
+    transition: 0.3s linear;
+
+.custom-nav a:hover {
+    color: #077b32; /* Hover effect: color change to green */
+}}
+
+body {
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(to right, #000000, #077b32);
+    color: white;
+    font-family: sans-serif;
+  }
+
+  .rubik-wet-paint-regular {
+    font-family: "Rubik Wet Paint", system-ui;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+h1 {
+    font-size: 6em;
+    text-align: center;
+}
+  
+
+h2 {
+    text-align: center;
+    margin-top: 3em;
+}

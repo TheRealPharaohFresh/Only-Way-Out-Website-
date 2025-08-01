@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrapHouse</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="TheTrap.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik+Wet+Paint&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-xl custom-nav bg-black">
+      <div class="container-fluid">
+        <!-- Navbar brand (logo) -->
+        <a href="Home.html" class="navbar-brand">
+          <img src="/images/onlywayoutloho.PNG" alt="only way out logo" class="logo" />
+        </a>
+
+        <!-- Hamburger toggle button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarBasic"
+          aria-controls="navbarBasic"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible nav links -->
+        <div class="collapse navbar-collapse" id="navbarBasic">
+          <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+            <li class="nav-item"><a class="nav-link" href="Albums.html">Albums</a></li>
+            <li class="nav-item"><a class="nav-link" href="Videos.html">Videos</a></li>
+            <li class="nav-item"><a class="nav-link" href="MembershipRegistration.html">Membership Registration</a></li>
+            <li class="nav-item"><a class="nav-link" href="Information.html">Information Page</a></li>
+            <li class="nav-item"><a class="nav-link" href="TheTrap.html">TrapHouse</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <h1 class="rubik-wet-paint-regular">Shop With Me Twin</h1>
+  <h2 class="rubik-wet-paint-regular">Released Music</h2>
+
+  <div id="carouselWithInterval" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active" data-bs-interval="10000">
+        <div class="d-flex flex-column align-items-center justify-content-center p-4">
+          <img src="/images/KeepIt100FINAL.jpg" class="d-block w-50 mb-3" alt="Track Art">
+          <h3>“Keep It 100 Ft. Atl Jacob”</h3>
+          <audio controls>
+            <source src="Music/PharaohFresh-Keep It 100 Ft Atl Jacob.mp3" type="audio/mpeg">
+          </audio>
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="mt-3">
+            <input type="hidden" name="cmd" value="_xclick">
+            <input type="hidden" name="business" value="onlywayoutllc@gmail.com">
+            <input type="hidden" name="item_name" value="PharaohFresh-Keep It 100 Ft. Atl Jacob- Full Download">
+            <input type="hidden" name="amount" value="1.99">
+            <input type="hidden" name="currency_code" value="USD">
+            <input type="hidden" name="return" value="http://127.0.0.1:5000/download/keep-it-100?token=keepitreal123">
+            <input type="submit" class="btn btn-primary" value="Buy Now $1.99">
+          </form>
+        </div>
+      </div>
+      <div class="carousel-item" data-bs-interval="2000">
+        <div class="d-flex flex-column align-items-center justify-content-center p-4">
+          <img src="images/ChatGPT Image May 3, 2025, 07_21_55 PM.PNG" class="d-block w-50 mb-3" alt="Track Art">
+          <h3>“For Me”</h3>
+          <audio controls>
+            <source src="Music/PharaohFresh-For Me.mp3" type="audio/mpeg">
+          </audio>
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="mt-3">
+            <input type="hidden" name="cmd" value="_xclick">
+            <input type="hidden" name="business" value="onlywayoutllc@gmail.com>
+            <input type="hidden" name="item_name" value="PharaohFresh-For Me - Full Download">
+            <input type="hidden" name="amount" value="1.99">
+            <input type="hidden" name="currency_code" value="USD">
+            <input type="hidden" name="return" value="https://yourdomain.com/download.html?file=TrapSymphony.mp3">
+            <input type="submit" class="btn btn-primary" value="Buy Now $1.99">
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <a class="carousel-control-prev" href="#carouselWithInterval" role="button" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#carouselWithInterval" role="button" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </a>
+  </div>
+
+  <div class="toast toast-demo fade show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Only Way Out</strong>
+      <small>Just Now</small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Welcome To The Trap, Buy Some Or Get Out!
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const toastEl = document.querySelector('.toast');
+      const toast = new bootstrap.Toast(toastEl, {
+        autohide: true,
+        delay: 10000
+      });
+      toast.show();
+    });
+  </script>
+</body>
+</html>
