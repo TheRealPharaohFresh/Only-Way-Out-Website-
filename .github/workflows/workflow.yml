@@ -10,46 +10,59 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 🔁 Pull the code
+      # 🔁 Checkout repo
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # 🐍 Set up Python for Flask
+      # 🐍 Set up Python 3.11
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
+      # 📦 Install Python dependencies
       - name: Install Python dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r backend/requirements.txt
-        
 
+      # 🧪 Run Flask sanity check (optional)
       - name: Run Flask sanity check (optional)
         run: |
           source venv/bin/activate
-          python app.py &
-          sleep 5
+          python backend/app.py &  # Start Flask app in the background
+          sleep 5                  # Wait for the app to start
           curl --fail http://localhost:5000 || (echo "Flask app not running" && exit 1)
 
-      # 🔥 Set up Node for Firebase Functions
+      # 🚀 Deploy Flask backend to Render
+      - name: Deploy Flask backend to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Accept: application/json" \
+            https://api.render.com/deploy/srv-xxxxxxxxxxxxxxxxxxxx
+
+      # 🔥 Set up Node.js for Firebase functions
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '20'
 
+      # 📦 Install Firebase CLI
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
+      # 📦 Install Firebase Functions dependencies
       - name: Install Functions Dependencies
         run: npm install
         working-directory: functions
 
       # 🚀 Deploy Firebase Functions
-      - name: Deploy to Firebase
+      - name: Deploy Firebase Functions
         run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }}
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
