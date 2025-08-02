@@ -66,5 +66,6 @@ jobs:
       # 🚀 Deploy Firebase Functions
       - name: Deploy Firebase Functions
         run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }}
+        working-directory: functions
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
