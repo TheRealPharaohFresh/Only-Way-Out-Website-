@@ -7,13 +7,13 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app, origins=["*"])  # Replace "*" with your actual Netlify domain for security
+# Register YouTube blueprint
+from .youtube import youtube_bp
+app.register_blueprint(youtube_bp, url_prefix='/api/youtube')
 
 # Load environment variables
 DOWNLOAD_TOKEN = os.getenv("SECRET_TOKEN")
 
-# Register YouTube blueprint
-from youtube import youtube_bp
-app.register_blueprint(youtube_bp, url_prefix='/api/youtube')
 
 # Define base directory for music
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
