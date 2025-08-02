@@ -12,7 +12,7 @@ CORS(app, origins=["*"])  # Replace "*" with your actual Netlify domain for secu
 DOWNLOAD_TOKEN = os.getenv("SECRET_TOKEN")
 
 # Register YouTube blueprint
-from youtube import youtube_bp
+from backend.youtube import youtube_bp
 app.register_blueprint(youtube_bp, url_prefix='/api/youtube')
 
 # Define base directory for music
