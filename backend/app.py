@@ -1,19 +1,29 @@
-from flask import Flask, request, send_file, abort
+from flask import Flask, request, send_file, abort, jsonify
+from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app, origins=["*"])  # Replace "*" with your actual Netlify domain for security
+
+# Load environment variables
 DOWNLOAD_TOKEN = os.getenv("SECRET_TOKEN")
 
+# Register YouTube blueprint
+from youtube import youtube_bp
+app.register_blueprint(youtube_bp, url_prefix='/api/youtube')
+
+# Define base directory for music
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 MUSIC_DIR = os.path.join(BASE_DIR, "Music")
 
 
 @app.route("/", methods=["GET"])
 def index():
-    return "🔥 Welcome to Pharaoh's Secure Download API"
+    return jsonify(message="🔥 Welcome to Pharaoh's Secure Download API")
+
 
 @app.route("/download/<track>")
 def download(track):
@@ -42,4 +52,4 @@ def download(track):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=False)

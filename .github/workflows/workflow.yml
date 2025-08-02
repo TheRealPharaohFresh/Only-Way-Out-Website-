@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 🔁 Checkout repo
+      # 🔁 Checkout repository code
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -21,22 +21,24 @@ jobs:
           python-version: '3.11'
 
       # 📦 Install Python dependencies
-      - name: Install Python dependencies
+      - name: Install Flask backend dependencies
+        working-directory: backend
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          pip install -r backend/requirements.txt
+          pip install -r requirements.txt
 
       # 🧪 Run Flask sanity check (optional)
-      - name: Run Flask sanity check (optional)
+      - name: Sanity check Flask app
+        working-directory: backend
         run: |
           source venv/bin/activate
-          python backend/app.py &  # Start Flask app in the background
-          sleep 5                  # Wait for the app to start
-          curl --fail http://localhost:5000 || (echo "Flask app not running" && exit 1)
+          nohup python app.py &
+          sleep 5
+          curl --fail http://localhost:5000 || (echo "Flask app failed to start" && exit 1)
 
-      # 🚀 Deploy Flask backend to Render
+      # 🚀 Trigger Render deployment (REPLACE SERVICE ID)
       - name: Deploy Flask backend to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
@@ -57,7 +59,7 @@ jobs:
         run: npm install -g firebase-tools
 
       # 📦 Install Firebase Functions dependencies
-      - name: Install Functions Dependencies
+      - name: Install Firebase functions dependencies
         run: npm install
         working-directory: functions
 
