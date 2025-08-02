@@ -61,7 +61,7 @@ jobs:
       # 📦 Install Firebase Functions dependencies
       - name: Install Firebase functions dependencies
         run: npm install
-        working-directory: functions
+        working-directory: frontend/functions
 
       # 🚀 Deploy Firebase Functions
       - name: Deploy Firebase Functions
