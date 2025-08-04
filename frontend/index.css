@@ -123,16 +123,16 @@ section {
    background-color: #077b32;
 }
 .social-links i.facebook {
-    background-image: url("../frontend/images/FaceBookLogo.jpg");
+    background-image: url("/images/FaceBookLogo.jpg");
 }
 .social-links i.twitter {
-    background-image: url("../frontend/images/TwitterLogoTransparent.png");
+    background-image: url("/images/TwitterLogoTransparent.png");
 }
 .social-links i.GitHub {
-    background-image: url("../frontend/images/GithubLogoTransparent.jpg");
+    background-image: url("/images/GithubLogoTransparent.jpg");
 }
 .social-links i.instagram {
-    background-image: url("../frontend/images/InstagramLogoTransparent.jpg");
+    background-image: url("/images/InstagramLogoTransparent.jpg");
 }
 
 .content button {
