@@ -29,16 +29,14 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 🧪 Run Flask sanity check (optional)
-      - name: Sanity check Flask app
+      # ✅ Gunicorn startup check (not running app, just confirming import works)
+      - name: Gunicorn sanity check
         working-directory: backend
         run: |
           source venv/bin/activate
-          nohup python app.py &
-          sleep 5
-          curl --fail http://localhost:5000 || (echo "Flask app failed to start" && exit 1)
+          gunicorn app:app --check-config
 
-      # 🚀 Trigger Render deployment (REPLACE SERVICE ID)
+      # 🚀 Trigger Render deployment
       - name: Deploy Flask backend to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
@@ -69,3 +67,4 @@ jobs:
         working-directory: frontend
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+

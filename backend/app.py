@@ -8,7 +8,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, origins=["*"])  # Replace "*" with your actual Netlify domain for security
 # Register YouTube blueprint
-from .youtube import youtube_bp
+from youtube import youtube_bp
 app.register_blueprint(youtube_bp, url_prefix='/api/youtube')
 
 # Load environment variables
