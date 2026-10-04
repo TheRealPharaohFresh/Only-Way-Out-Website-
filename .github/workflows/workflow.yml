@@ -1,67 +1,141 @@
-name: Full Stack Deploy (Flask + Firebase)
+name: Test and deploy
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
+  test:
+    name: Test application
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      SECRET_TOKEN: ci-test-secret
+      YOUTUBE_API_KEY: ci-test-youtube-key
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend dependencies and test runner
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r backend/requirements.txt pytest
+
+      - name: Run backend tests
+        run: python -m pytest backend/test_app.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/functions/package-lock.json
+
+      - name: Install Firebase Functions dependencies
+        working-directory: frontend/functions
+        run: npm ci
+
+      - name: Lint Firebase Functions
+        working-directory: frontend/functions
+        run: npm run lint
+
   deploy:
+    name: Deploy backend and Firebase
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/functions/package-lock.json
+
+      - name: Install Firebase Functions dependencies
+        working-directory: frontend/functions
+        run: npm ci
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Flask backend dependencies
-        working-directory: backend
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools
 
-      - name: Sanity check Flask app
-        working-directory: backend
+      - name: Deploy Firebase Functions and Firestore rules
+        working-directory: frontend
         env:
-          PYTHONPATH: ${{ github.workspace }}/backend
-          SECRET_TOKEN: ${{ secrets.SECRET_TOKEN }}
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
-          source venv/bin/activate
-          nohup python app.py &
-          sleep 5
-          curl --fail http://localhost:5000 || (echo "Flask app failed to start" && exit 1)
+          test -n "$FIREBASE_TOKEN" || (echo "FIREBASE_TOKEN secret is required" && exit 1)
+          firebase deploy --only functions,firestore:rules --non-interactive --token "$FIREBASE_TOKEN"
 
-      - name: Deploy Flask backend to Render
+      - name: Deploy Flask backend and verify it is live
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
         run: |
-          curl -X POST \
-            -H "Authorization: Bearer $RENDER_API_KEY" \
-            -H "Accept: application/json" \
-            https://api.render.com/deploy/$RENDER_SERVICE_ID
+          test -n "$RENDER_API_KEY" || (echo "RENDER_API_KEY secret is required" && exit 1)
+          test -n "$RENDER_SERVICE_ID" || (echo "RENDER_SERVICE_ID secret is required" && exit 1)
+          AUTH_HEADER="Bearer $RENDER_API_KEY"
+          DEPLOY_RESPONSE=$(curl --fail-with-body --silent --show-error --request POST \
+            --header "Authorization: $AUTH_HEADER" \
+            --header "Accept: application/json" \
+            "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys")
+          DEPLOY_ID=$(printf '%s' "$DEPLOY_RESPONSE" | jq -r '.id // empty')
+          test -n "$DEPLOY_ID" || (echo "Render did not return a deployment ID" && exit 1)
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20'
+          DEPLOY_STATUS=""
+          for attempt in $(seq 1 40); do
+            DEPLOY_STATUS=$(curl --fail-with-body --silent --show-error \
+              --header "Authorization: $AUTH_HEADER" \
+              --header "Accept: application/json" \
+              "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys/$DEPLOY_ID" \
+              | jq -r '.status // "unknown"')
+            echo "Render deployment status: $DEPLOY_STATUS"
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+            case "$DEPLOY_STATUS" in
+              live) break ;;
+              build_failed|update_failed|pre_deploy_failed|canceled|deactivated)
+                echo "Render deployment ended with status: $DEPLOY_STATUS"
+                exit 1
+                ;;
+            esac
 
-      - name: Install Firebase functions dependencies
-        working-directory: frontend/functions
-        run: npm install
+            sleep 15
+          done
 
-      - name: Deploy Firebase Functions
-        working-directory: frontend
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: firebase deploy --only functions --token $FIREBASE_TOKEN
+          test "$DEPLOY_STATUS" = "live" || (echo "Render deployment did not become live before timeout" && exit 1)
+          curl --fail --silent --show-error --retry 12 --retry-delay 10 --retry-all-errors \
+            https://only-way-out-website-1.onrender.com/
+          DOWNLOAD_RESPONSE=$(curl --fail --silent --show-error --retry 12 --retry-delay 10 --retry-all-errors \
+            https://only-way-out-website-1.onrender.com/api/download-url/keep-it-100)
+          DOWNLOAD_URL=$(printf '%s' "$DOWNLOAD_RESPONSE" | jq -r '.download_url // empty')
+          case "$DOWNLOAD_URL" in
+            https://*/download/keep-it-100\?token=*) ;;
+            *) echo "Download API did not return a valid signed URL" && exit 1 ;;
+          esac
+          curl --fail --silent --show-error --retry 12 --retry-delay 10 --retry-all-errors \
+            --output /dev/null "$DOWNLOAD_URL"

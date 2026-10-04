@@ -1,168 +1,72 @@
-# 🔥 Only Way Out LLC — Full Stack Web Platform
+# Only Way Out LLC
 
-**Author**: Donald Clemons  
-**Website**: [onlywayout.netlify.app](https://onlywayout.netlify.app)  
-**Render Backend**: [Download API](https://only-way-out-website-1.onrender.com)
+Static artist and company website with a Flask API and Firebase services.
 
----
+## Project layout
 
-## 🎯 Overview
+- `frontend/` — Static HTML, CSS, browser JavaScript, and Firebase configuration.
+- `frontend/functions/` — Firebase Cloud Functions.
+- `backend/` — Flask download and YouTube API.
+- `.github/workflows/workflow.yml` — CI checks and deployment workflow.
 
-This is the full-stack application for **Only Way Out LLC**, a multimedia brand merging music, film, and culture through tech.
+The static frontend has no compile/build step. Netlify hosts the frontend separately through its existing Git integration; the GitHub Actions workflow tests the repository, deploys Firebase services and the Render backend, waits for the Render deployment to become live, and smoke-tests the API.
 
-The stack includes:
-- A secure Flask-based backend API for music downloads
-- A Netlify-hosted static frontend for streaming and shopping
-- Firebase backend automation for user onboarding
-- Continuous deployment via GitHub Actions
+## Local checks
 
----
+Run backend tests from the repository root:
 
-## ⚙️ Technology Stack
+```sh
+python -m pip install -r backend/requirements.txt pytest
+SECRET_TOKEN=local-test-secret python -m pytest backend/test_app.py
+```
 
-| Tech                  | Role                                          | Usage % |
-|-----------------------|-----------------------------------------------|---------|
-| HTML5 + Bootstrap 5   | Static frontend (pages, carousel, layout)     | 55%     |
-| Python (Flask)        | Secure file download backend                  | 15%     |
-| JavaScript (Node.js)  | Firebase Functions (welcome emails)           | 20%     |
-| CSS                   | Custom styling for TrapHouse and other pages  | 5%      |
-| GitHub Actions        | CI/CD automation                              | 5%      |
+Run Firebase Functions lint:
 
----
+```sh
+cd frontend/functions
+npm ci
+npm run lint
+```
 
-## 🔐 Flask Secure Download API
+The workflow runs those checks for pull requests and pushes to `main`. A successful test job is required before deployment. Deployment runs only on `main` pushes or a manual workflow dispatch against `main`; pull requests never deploy.
 
-**API Base URL**: `https://only-way-out-website-1.onrender.com`
+## GitHub Actions deployment configuration
 
-### Available Endpoints:
+Configure these GitHub Actions secrets:
 
-| Endpoint                          | Method | Description                            |
-|-----------------------------------|--------|----------------------------------------|
-| `/`                               | GET    | Welcome route                          |
-| `/download/<track>?token=XYZ123` | GET    | Secure file download with token check  |
+| Secret | Used for |
+| --- | --- |
+| `FIREBASE_TOKEN` | Deploying Firebase Functions and Firestore rules |
+| `RENDER_API_KEY` | Triggering a Render deployment |
+| `RENDER_SERVICE_ID` | Selecting the Render service |
 
-**Environment Variable Required**:
-- `SECRET_TOKEN`: Used to validate download requests.
+The Render service must separately have `SECRET_TOKEN`, `ALLOWED_ORIGINS`, and (if view counts are enabled) `YOUTUBE_API_KEY` configured in its environment. The frontend is deployed separately through the Netlify integration.
 
-**Example track mapping**:
-```python
-track_map = {
-  "keep-it-100": "PharaohFresh-Keep it 100 Ft Atl Jacob.mp3",
-  "for-me": "PharaohFresh-For Me.mp3"
-}
+## Dependency audit follow-up
 
+The current Firebase Functions production dependency audit has no critical advisories, but still reports 2 high and 7 moderate vulnerabilities. The remaining high findings require a major `firebase-admin` upgrade to version 14, which is outside the compatible lockfile refresh and needs a coordinated Firebase Functions SDK/configuration migration before it can be safely deployed.
 
+## YouTube view counts
 
-🧠 Firebase Welcome Email Automation
-How It Works:
-New user signs up via MembershipRegistration.html.
+The YouTube endpoint returns a hidden-count response below 100 views. The TrapHouse page displays the count only when it is at least 100:
 
-Firebase Auth creates account and stores data in Firestore.
+```text
+GET /api/youtube/youtube_views?track=keep-it-100
+GET /api/youtube/youtube_views?track=for-me
+```
 
-Firebase Function (via functions/index.js) is triggered:
+## PayPal checkout status
 
-Sends a branded welcome email using Mailjet API.
+The TrapHouse page currently posts PayPal Standard checkout forms for $1.99 per track. It fetches a short-lived download URL from the API and places that URL in PayPal's `return` field.
 
-Email includes next steps and company branding.
+**This is not payment verification.** The download URL endpoint is currently public, so a client can request a valid download URL without completing a PayPal payment. Do not rely on this flow to restrict paid downloads until the backend verifies a PayPal order or verified IPN/webhook before issuing a download grant.
 
-💻 Static Frontend (Netlify)
-Live Frontend: https://onlywayout.netlify.app
+For a safe end-to-end test, configure PayPal Sandbox merchant and buyer accounts, use the Sandbox checkout endpoint and merchant account, complete a test payment, and confirm the transaction is `Completed` in the merchant Sandbox activity. Then verify the return/download and compare the downloaded audio with the intended track. Also test a cancelled/failed payment and confirm no download grant is issued. The current integration does not yet meet that last payment-gating requirement.
 
-Pages:
-Albums.html — Music projects
+## Final app check
 
-Videos.html — Video content
+The local release check covers the backend test suite, Firebase Functions lint, the eight primary frontend pages, local media and internal links, form validation, and the TrapHouse carousel controls. It deliberately does not submit a live PayPal transaction or create real Firebase accounts.
 
-MembershipRegistration.html — User sign-up
+In the pre-release live-site check, the Netlify pages and media returned HTTP 200, but `/site.css` returned 404. The deployed Render service also returned 404 for the new signed-download URL endpoint, and its YouTube view-count endpoint returned HTTP 502. These observations indicate the live services had not yet picked up all current source changes; recheck them after the deployment workflow finishes. The workflow now verifies that Render serves the download URL endpoint and the resulting audio file after deployment.
 
-TheTrap.html — Music purchase & playback
-
-Information.html — Brand details
-
-TrapHouse Shop Feature:
-Audio preview via <audio> tag
-
-PayPal integration for purchase
-
-Auto-redirect to backend API with download token after payment
-
-html
-Copy
-Edit
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-  <input type="hidden" name="return" value="https://only-way-out-website-1.onrender.com/download/keep-it-100?token=keepitreal123">
-</form>
-🚀 Deployment (GitHub Actions + Render + Firebase)
-CI/CD triggers on pushes to main:
-
-Backend Deployment to Render:
-yaml
-Copy
-Edit
-- name: Deploy Flask backend to Render
-  env:
-    RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-  run: |
-    curl -X POST \
-      -H "Authorization: Bearer $RENDER_API_KEY" \
-      https://api.render.com/deploy/srv-xxxxxxxxxxxxxxxxxxxx
-Firebase Deployment:
-yaml
-Copy
-Edit
-- name: Deploy Firebase Functions
-  run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }}
-📁 Project Structure
-pgsql
-Copy
-Edit
-only-way-out/
-├── backend/
-│   ├── app.py
-│   ├── requirements.txt
-│   └── Music/
-│       ├── PharaohFresh-Keep it 100 Ft Atl Jacob.mp3
-│       └── PharaohFresh-For Me.mp3
-├── functions/
-│   ├── index.js
-│   ├── package.json
-│   └── .env
-├── public/
-│   ├── index.html
-│   ├── Albums.html
-│   ├── TheTrap.html
-│   ├── MembershipRegistration.html
-│   └── images/
-├── styles/
-│   ├── styles4.css
-│   └── styles5.css
-└── .github/workflows/
-    └── deploy.yml
-🔒 Secrets Required
-Secret Name	Purpose
-SECRET_TOKEN	Secures Flask download route
-RENDER_API_KEY	Auth for Render deploys
-FIREBASE_TOKEN	Deploy Firebase functions
-MAILJET_API_KEY	Mailjet integration in Firebase func
-MAILJET_SECRET	Mailjet secret key
-
-🧪 Testing
-Test Download Link:
-bash
-Copy
-Edit
-https://only-way-out-website-1.onrender.com/download/keep-it-100?token=keepitreal123
-If successful:
-
-File downloads immediately
-
-Flask logs show token check passed
-
-If invalid:
-
-Returns 403 Unauthorized
-
-🙌 Credits
-Built with passion by Donald Clemons.
-Powered by technology, hustle, and creative fire.
-This ain’t just a website — it’s a movement.
+PayPal payment completion, Firebase account creation, and download authorization after a completed payment still require configured Sandbox/production credentials and payment verification. The current public download-URL endpoint is not proof of payment and must not be treated as a secure paid-download gate.

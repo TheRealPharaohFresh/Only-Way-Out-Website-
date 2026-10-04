@@ -6,6 +6,7 @@
   <title>TrapHouse</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="TheTrap.css">
+  <link rel="stylesheet" href="site.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +14,7 @@
 </head>
 
 <body>
+  <header>
     <nav class="navbar navbar-expand-xl custom-nav bg-black">
       <div class="container-fluid">
         <!-- Navbar brand (logo) -->
@@ -41,6 +43,7 @@
             <li class="nav-item"><a class="nav-link" href="MembershipRegistration.html">Membership Registration</a></li>
             <li class="nav-item"><a class="nav-link" href="Information.html">Information Page</a></li>
             <li class="nav-item"><a class="nav-link" href="TheTrap.html">TrapHouse</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#tour-dates">Tour Dates</a></li>
           </ul>
         </div>
       </div>
@@ -48,7 +51,7 @@
   </header>
 
   <h1 class="rubik-wet-paint-regular">Shop With Me Twin</h1>
-  <h2 class="rubik-wet-paint-regular">Released Music</h2>
+  <h2 class="rubik-wet-paint-regular">Unreleased Music</h2>
 
   <div id="carouselWithInterval" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
@@ -59,13 +62,13 @@
           <audio controls>
             <source src="/Music/PharaohFresh Ft AtlJacob - Keep It 100.mp3" type="audio/mpeg">
           </audio>
-          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="mt-3">
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="mt-3" data-track="keep-it-100">
             <input type="hidden" name="cmd" value="_xclick">
             <input type="hidden" name="business" value="onlywayoutllc@gmail.com">
             <input type="hidden" name="item_name" value="PharaohFresh-Keep It 100 Ft. Atl Jacob- Full Download">
             <input type="hidden" name="amount" value="1.99">
             <input type="hidden" name="currency_code" value="USD">
-            <input type="hidden" name="return" value="https://only-way-out-website-1.onrender.com/download/keep-it-100?token=keepitreal123">
+            <input type="hidden" name="return" value="">
             <input type="submit" class="btn btn-primary" value="Buy Now $1.99">
           </form>
           <p id="views-keep-it-100" class="text-muted">Loading views...</p>
@@ -77,15 +80,15 @@
           <img src="/images/ChatGPT Image May 3, 2025, 07_21_55 PM.PNG" class="d-block w-50 mb-3" alt="Track Art">
           <h3>“For Me”</h3>
           <audio controls>
-            <source src="Music/PharaohFresh-For Me.mp3" type="audio/mpeg">
+            <source src="/Music/PharaohFresh-For Me.mp3" type="audio/mpeg">
           </audio>
-          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="mt-3">
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="mt-3" data-track="for-me">
             <input type="hidden" name="cmd" value="_xclick">
             <input type="hidden" name="business" value="onlywayoutllc@gmail.com">
             <input type="hidden" name="item_name" value="PharaohFresh-For Me - Full Download">
             <input type="hidden" name="amount" value="1.99">
             <input type="hidden" name="currency_code" value="USD">
-            <input type="hidden" name="return" value="https://only-way-out-website-1.onrender.com/download/for-me?token=keepitreal123">
+            <input type="hidden" name="return" value="">
             <input type="submit" class="btn btn-primary" value="Buy Now $1.99">
           </form>
           <p id="views-for-me" class="text-muted">Loading views...</p>
@@ -103,6 +106,12 @@
       <span class="visually-hidden">Next</span>
     </a>
   </div>
+
+  <section class="merch-section" aria-labelledby="merch-heading">
+    <span class="merch-badge">Coming soon</span>
+    <h2 id="merch-heading">Only Way Out Merch</h2>
+    <p>Apparel and official gear are on the way. Stay tuned for the drop.</p>
+  </section>
 
   <div class="toast toast-demo fade show" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
@@ -130,6 +139,19 @@
   <script>
     const API_BASE_URL = "https://only-way-out-website-1.onrender.com";
 
+    async function fetchDownloadUrl(trackId, form) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/download-url/${trackId}`);
+        const data = await res.json();
+        const returnInput = form.querySelector('input[name="return"]');
+        if (returnInput && data.download_url) {
+          returnInput.value = data.download_url;
+        }
+      } catch (err) {
+        console.error(`Failed to prepare download URL for ${trackId}:`, err);
+      }
+    }
+
     async function fetchYouTubeViews(trackId, elementId) {
       try {
         const res = await fetch(
@@ -137,13 +159,15 @@
         );
         const data = await res.json();
 
-        if (data.youtube_views !== undefined) {
+        if (data.views_hidden || (Number.isInteger(data.youtube_views) && data.youtube_views < 100)) {
+          document.getElementById(elementId).textContent = "Views coming soon";
+        } else if (Number.isInteger(data.youtube_views) && data.youtube_views >= 100) {
           document.getElementById(elementId).textContent = `${data.youtube_views.toLocaleString()} YouTube views`;
         } else {
-          document.getElementById(elementId).textContent = "View count unavailable";
+          document.getElementById(elementId).textContent = "Views unavailable";
         }
       } catch (err) {
-        document.getElementById(elementId).textContent = "Error loading views";
+        document.getElementById(elementId).textContent = "Views unavailable";
         console.error(err);
       }
     }
@@ -151,6 +175,23 @@
     window.addEventListener("DOMContentLoaded", () => {
       fetchYouTubeViews("keep-it-100", "views-keep-it-100");
       fetchYouTubeViews("for-me", "views-for-me");
+
+      document.querySelectorAll('form[data-track]').forEach(async (form) => {
+        const trackId = form.dataset.track;
+        await fetchDownloadUrl(trackId, form);
+
+        form.addEventListener("submit", async (event) => {
+          if (!form.querySelector('input[name="return"]').value) {
+            event.preventDefault();
+            await fetchDownloadUrl(trackId, form);
+            if (!form.querySelector('input[name="return"]').value) {
+              alert("Download link is unavailable right now. Please try again.");
+              return;
+            }
+            form.submit();
+          }
+        });
+      });
     });
   </script>
 
