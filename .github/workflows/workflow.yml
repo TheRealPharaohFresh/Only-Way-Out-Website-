@@ -87,10 +87,14 @@ jobs:
       - name: Deploy Firebase Functions and Firestore rules
         working-directory: frontend
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
         run: |
-          test -n "$FIREBASE_TOKEN" || (echo "FIREBASE_TOKEN secret is required" && exit 1)
-          firebase deploy --only functions,firestore:rules --non-interactive --token "$FIREBASE_TOKEN"
+          test -n "$FIREBASE_SERVICE_ACCOUNT_JSON" || (echo "FIREBASE_SERVICE_ACCOUNT_JSON secret is required" && exit 1)
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > "$GOOGLE_APPLICATION_CREDENTIALS"
+          chmod 600 "$GOOGLE_APPLICATION_CREDENTIALS"
+          node -e "JSON.parse(require('fs').readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'))"
+          firebase deploy --only functions,firestore:rules --non-interactive
 
   deploy-render:
     name: Deploy Flask backend

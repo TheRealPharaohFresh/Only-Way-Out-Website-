@@ -36,13 +36,13 @@ Configure these GitHub Actions secrets:
 
 | Secret | Used for |
 | --- | --- |
-| `FIREBASE_TOKEN` | Deploying Firebase Functions and Firestore rules |
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | Google service-account JSON used to deploy Firebase Functions and Firestore rules |
 | `RENDER_API_KEY` | Triggering a Render deployment |
 | `RENDER_SERVICE_ID` | Selecting the Render service |
 
 The Render service must separately have `SECRET_TOKEN`, `ALLOWED_ORIGINS`, and (if view counts are enabled) `YOUTUBE_API_KEY` configured in its environment. The frontend is deployed separately through the Netlify integration.
 
-Firebase and Render deployment jobs run independently after tests pass, so an expired or revoked Firebase CLI token does not prevent the Render backend from deploying. If Firebase deployment reports HTTP 401, refresh the `FIREBASE_TOKEN` GitHub secret with a valid Firebase CLI token.
+Firebase and Render deployment jobs run independently after tests pass. Create a Google Cloud service account for the Firebase project, grant it the Firebase deployment permissions required by the services being deployed, enable the required Google APIs, and store its complete JSON key file as the `FIREBASE_SERVICE_ACCOUNT_JSON` GitHub Actions secret. The workflow validates the JSON and uses Application Default Credentials instead of the deprecated `firebase login:ci` token.
 Set `RENDER_SERVICE_ID` to the raw Render ID (for example, `srv-...`), not the Render dashboard URL; the workflow validates this before making the deploy request.
 
 ## Dependency audit follow-up
@@ -70,6 +70,6 @@ For a safe end-to-end test, configure PayPal Sandbox merchant and buyer accounts
 
 The local release check covers the backend test suite, Firebase Functions lint, the eight primary frontend pages, local media and internal links, form validation, and the TrapHouse carousel controls. It deliberately does not submit a live PayPal transaction or create real Firebase accounts.
 
-In the pre-release live-site check, the Netlify pages and media returned HTTP 200, but `/site.css` returned 404. After pushing, `/site.css` returned HTTP 200 and the live TrapHouse page showed the merch-coming-soon section. The GitHub Actions test job passed. Firebase deployment returned HTTP 401 because the configured Firebase token is invalid. The independent Render deployment then failed because its configured service URL was malformed; verify that `RENDER_SERVICE_ID` contains only the raw `srv-...` identifier and that `RENDER_API_KEY` is a valid API key. The live Render download URL endpoint is still HTTP 404, and its YouTube view-count endpoint still returns HTTP 502. Once deployment credentials are corrected, the Render job verifies the download URL endpoint and resulting audio file.
+In the pre-release live-site check, the Netlify pages and media returned HTTP 200, but `/site.css` returned 404. After pushing, `/site.css` returned HTTP 200 and the live TrapHouse page showed the merch-coming-soon section. The GitHub Actions test job passed. Firebase deployment returned HTTP 401 with the old CLI token; the workflow now uses `FIREBASE_SERVICE_ACCOUNT_JSON` instead. The independent Render deployment failed its service-ID format check; set `RENDER_SERVICE_ID` to the raw `srv-...` identifier and confirm `RENDER_API_KEY` is valid. The live Render download URL endpoint is still HTTP 404, and its YouTube view-count endpoint still returns HTTP 502. Once deployment credentials are corrected, the Render job verifies the download URL endpoint and resulting audio file.
 
 PayPal payment completion, Firebase account creation, and download authorization after a completed payment still require configured Sandbox/production credentials and payment verification. The current public download-URL endpoint is not proof of payment and must not be treated as a secure paid-download gate.
