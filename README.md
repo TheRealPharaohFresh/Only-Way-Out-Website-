@@ -42,6 +42,8 @@ Configure these GitHub Actions secrets:
 
 The Render service must separately have `SECRET_TOKEN`, `ALLOWED_ORIGINS`, and (if view counts are enabled) `YOUTUBE_API_KEY` configured in its environment. The frontend is deployed separately through the Netlify integration.
 
+Firebase and Render deployment jobs run independently after tests pass, so an expired or revoked Firebase CLI token does not prevent the Render backend from deploying. If Firebase deployment reports HTTP 401, refresh the `FIREBASE_TOKEN` GitHub secret with a valid Firebase CLI token.
+
 ## Dependency audit follow-up
 
 The current Firebase Functions production dependency audit has no critical advisories, but still reports 2 high and 7 moderate vulnerabilities. The remaining high findings require a major `firebase-admin` upgrade to version 14, which is outside the compatible lockfile refresh and needs a coordinated Firebase Functions SDK/configuration migration before it can be safely deployed.
@@ -67,6 +69,6 @@ For a safe end-to-end test, configure PayPal Sandbox merchant and buyer accounts
 
 The local release check covers the backend test suite, Firebase Functions lint, the eight primary frontend pages, local media and internal links, form validation, and the TrapHouse carousel controls. It deliberately does not submit a live PayPal transaction or create real Firebase accounts.
 
-In the pre-release live-site check, the Netlify pages and media returned HTTP 200, but `/site.css` returned 404. The deployed Render service also returned 404 for the new signed-download URL endpoint, and its YouTube view-count endpoint returned HTTP 502. These observations indicate the live services had not yet picked up all current source changes; recheck them after the deployment workflow finishes. The workflow now verifies that Render serves the download URL endpoint and the resulting audio file after deployment.
+In the pre-release live-site check, the Netlify pages and media returned HTTP 200, but `/site.css` returned 404. After pushing, `/site.css` returned HTTP 200. The first GitHub Actions test job passed, but Firebase deployment returned HTTP 401 because the configured Firebase token is invalid; that also skipped Render before the deployment jobs were separated. The live Render download URL endpoint was therefore not serving the new route, and its YouTube view-count endpoint still returned HTTP 502. The Render deployment job now runs independently and verifies the download URL endpoint and resulting audio file after deployment.
 
 PayPal payment completion, Firebase account creation, and download authorization after a completed payment still require configured Sandbox/production credentials and payment verification. The current public download-URL endpoint is not proof of payment and must not be treated as a secure paid-download gate.

@@ -55,8 +55,8 @@ jobs:
         working-directory: frontend/functions
         run: npm run lint
 
-  deploy:
-    name: Deploy backend and Firebase
+  deploy-firebase:
+    name: Deploy Firebase
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: test
     runs-on: ubuntu-latest
@@ -92,6 +92,13 @@ jobs:
           test -n "$FIREBASE_TOKEN" || (echo "FIREBASE_TOKEN secret is required" && exit 1)
           firebase deploy --only functions,firestore:rules --non-interactive --token "$FIREBASE_TOKEN"
 
+  deploy-render:
+    name: Deploy Flask backend
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Deploy Flask backend and verify it is live
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
