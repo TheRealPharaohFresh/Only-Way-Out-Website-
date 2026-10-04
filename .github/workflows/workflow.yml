@@ -106,6 +106,10 @@ jobs:
         run: |
           test -n "$RENDER_API_KEY" || (echo "RENDER_API_KEY secret is required" && exit 1)
           test -n "$RENDER_SERVICE_ID" || (echo "RENDER_SERVICE_ID secret is required" && exit 1)
+          if [[ ! "$RENDER_SERVICE_ID" =~ ^srv-[A-Za-z0-9]+$ ]]; then
+            echo "RENDER_SERVICE_ID must be the raw Render service ID (srv-...), not a dashboard URL"
+            exit 1
+          fi
           AUTH_HEADER="Bearer $RENDER_API_KEY"
           DEPLOY_RESPONSE=$(curl --fail-with-body --silent --show-error --request POST \
             --header "Authorization: $AUTH_HEADER" \
